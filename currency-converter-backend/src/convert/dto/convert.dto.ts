@@ -11,4 +11,7 @@ export class ConvertDto {
 
   @IsNumber()
   amount: number;
+
+  @IsString()
+  idempotency_key: string;
 }

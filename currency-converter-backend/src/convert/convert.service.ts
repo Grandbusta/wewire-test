@@ -18,7 +18,7 @@ export class ConvertService {
     ) { }
 
     async convertCurrency(userId: string, convertDto: ConvertDto): Promise<any> {
-        const { source_currency, target_currency, amount } = convertDto;
+        const { source_currency, target_currency, amount, idempotency_key } = convertDto;
 
         if (amount <= 0) {
             throw new BadRequestException('Amount must be greater than zero.');
@@ -29,6 +29,19 @@ export class ConvertService {
         await queryRunner.startTransaction()
 
         try {
+
+            if (idempotency_key) {
+                const existingTransaction = await queryRunner.manager.findOne(Transaction, {
+                    where: { idempotency_key: idempotency_key },
+                });
+                if (existingTransaction) {
+                    throw new BadRequestException('Transaction already exists.');
+                }
+            } else {
+                throw new BadRequestException('Idempotency key is required.');
+            }
+
+
             // Fetch the user's balance for the source currency
             const sourceBalance = await queryRunner.manager.findOne(UserBalance, {
                 where: { user: { id: userId }, currency: source_currency },
@@ -49,7 +62,7 @@ export class ConvertService {
 
             // Calculate conversion rate and the converted amount
             const conversion_rate = rates[target_currency] / rates[source_currency];
-            const converted_amount =  Number((amount * conversion_rate).toFixed(6));
+            const converted_amount = Number((amount * conversion_rate).toFixed(6));
 
             sourceBalance.amount = Number(sourceBalance.amount) - amount;
             await queryRunner.manager.save(sourceBalance);
@@ -77,6 +90,7 @@ export class ConvertService {
                 amount,
                 converted_amount: converted_amount,
                 conversion_rate: conversion_rate,
+                idempotency_key: idempotency_key,
             });
 
             await queryRunner.manager.save(transaction);

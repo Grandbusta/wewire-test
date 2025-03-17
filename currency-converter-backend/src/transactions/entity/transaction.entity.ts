@@ -24,6 +24,9 @@ export class Transaction {
   @CreateDateColumn({ type: 'timestamptz' })
   created_at: Date;
 
+  @Column({ unique: true })
+  idempotency_key: string;
+
   @ManyToOne(() => User, user => user.transactions, { onDelete: 'CASCADE' })
   user: User;
 }
