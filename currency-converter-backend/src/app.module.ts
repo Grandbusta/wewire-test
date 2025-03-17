@@ -4,6 +4,8 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ExchangeModule } from './exchange/exchange.module';
+import { TransactionsModule } from './transactions/transactions.module';
 
 
 
@@ -20,7 +22,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       autoLoadEntities: true, 
       synchronize: true
     }),
-    AuthModule
+    AuthModule,
+    ExchangeModule,
+    TransactionsModule
   ],
   controllers: [AppController],
   providers: [AppService],
