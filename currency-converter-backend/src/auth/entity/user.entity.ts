@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
 import { Transaction } from '../../transactions/entity/transaction.entity';
+import { UserBalance } from './user-balance.entity';
 
 
 @Entity()
@@ -18,4 +19,7 @@ export class User {
 
   @OneToMany(() => Transaction, transaction => transaction.user)
   transactions: Transaction[];
+
+  @OneToMany(() => UserBalance, balance => balance.user)
+  balances: UserBalance[];
 }
