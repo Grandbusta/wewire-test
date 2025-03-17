@@ -7,11 +7,19 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ExchangeModule } from './exchange/exchange.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { ConvertModule } from './convert/convert.module';
-
+import { ThrottlerModule } from '@nestjs/throttler';
 
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          ttl: 60000,
+          limit: 10,
+        },
+      ],
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
